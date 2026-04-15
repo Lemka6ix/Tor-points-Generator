@@ -142,3 +142,75 @@ public:
             points_arr.push_back(rnd());
         }
     }
+
+
+    point3d i_point_position(int i)
+    {
+        if (i < 0 || i >= points_arr.size()) {
+            std::cout << "Incorrect index\n";
+            return point3d();
+        }
+        return points_arr[i];
+    }
+    
+     void new_user_point(double x, double y, double z)
+    {
+        points_arr.push_back(point3d(x, y, z));
+    }
+
+    std::vector<double> get_tilt_angles() const {
+        return {tilt_angle_x * 180.0 / M_PI, 
+                tilt_angle_y * 180.0 / M_PI, 
+                tilt_angle_z * 180.0 / M_PI};
+    }
+
+    void write_data_to_file() {
+        std::ofstream out;
+        out.open("points.txt");
+        if (out.is_open())
+        {
+            for (int i = 0; i < points_arr.size(); i++)
+            {
+                out << points_arr[i].x << "\t" << points_arr[i].y << "\t" << points_arr[i].z << "\n";
+            }
+        }
+        out.close();
+    }
+
+    void run_visualization() {
+        std::stringstream command;
+        command << "python visualize.py";
+        
+        std::cout << "Running: " << command.str() << std::endl;
+        int result = system(command.str().c_str());
+        
+        if (result == 0) {
+            std::cout << "Visualization completed" << std::endl;
+        } else {
+            std::cout << "Visualization error" << std::endl;
+        }
+    }
+
+    void write_parameters_to_file(int K, double R, double r) {
+        std::ofstream out;
+        out.open("setting.dat");
+        if (out.is_open())
+        {
+            out << "K: " << K << "\n" 
+                << "R: " << R << "\n" 
+                << "r: " << r << "\n"
+                << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")\n"
+                << "Tilt angles (degrees): X=" << tilt_angle_x * 180.0 / M_PI 
+                << ", Y=" << tilt_angle_y * 180.0 / M_PI 
+                << ", Z=" << tilt_angle_z * 180.0 / M_PI << "\n";      
+        }
+        out.close();
+    }
+
+    void printPoints() {
+        std::cout << "Points in vector (" << points_arr.size() << " points):\n";
+        for (auto point : points_arr) {
+            point.print();
+        }
+    }
+};
