@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sstream>
 
+
 struct point3d
 {  
     double x; 
@@ -214,3 +215,95 @@ public:
         }
     }
 };
+
+
+int menu_func(int choise)
+{
+    std::cout << "Menu:\n" 
+            << "1. i point coords\n"
+            << "2. Add new point\n"
+            << "3. Save data in points.txt\n"
+            << "4. Save parameters in setting.dat\n"
+            << "5. Visualization (matplotlib)\n"
+            << "0. Exit\n"
+            << "Enter your choise: ";
+
+    std::cin >> choise;
+    return choise;
+}
+
+
+int main()
+{
+    int K;        
+    double R;     
+    double r;     
+    int choise;   
+    int i;        
+    double x, y, z;
+    double center_x, center_y, center_z;
+    double tilt_x, tilt_y, tilt_z; 
+
+    std::cout << "Enter K: ";
+    std::cin >> K;
+    std::cout << "Enter R: ";
+    std::cin >> R;
+    std::cout << "Enter r: ";
+    std::cin >> r;
+
+    std::cout << "Enter torus center (x y z): ";
+    std::cin >> center_x >> center_y >> center_z;
+
+    std::cout << "Enter tilt angles in degrees (x y z): ";
+    std::cin >> tilt_x >> tilt_y >> tilt_z;
+
+    Figure fig(R, r, center_x, center_y, center_z, tilt_x, tilt_y, tilt_z);
+    fig.filling_K(K);
+
+    while (choise != 0) {
+        choise = menu_func(choise);
+
+        switch (choise)
+        {
+            case 1: {
+                std::cout << "i point position. Enter index i: ";
+                std::cin >> i;
+                point3d i_point = fig.i_point_position(i);
+                i_point.print();
+                std::cout << "\n";
+                break;
+            }
+            case 2: {
+                std::cout << "Enter coords of new point (x y z): ";
+                std::cin >> x >> y >> z;
+                fig.new_user_point(x, y, z);
+                std::cout << "Point added.\n\n";
+                break;
+            }
+            case 3: {
+                fig.write_data_to_file();
+                std::cout << "Data saved to points.txt\n\n";
+                break;
+            }
+            case 4: {
+                fig.write_parameters_to_file(K, R, r);
+                std::cout << "Parameters saved to setting.dat\n\n";
+                break;
+            }
+            case 5: {
+                fig.run_visualization();
+                std::cout << "\n";
+                break;
+            }
+            case 0: {
+                return 0;
+            }
+            default: {
+                std::cout << "Incorrect choise\n";
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
