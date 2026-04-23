@@ -6,38 +6,78 @@
 #include <cstdlib>
 #include <sstream>
 
+/**
+ * @file 1.cpp
+ * @brief Основной файл программы для генерации точек на торе
+ * @author Климентий
+ * @version 1.0
+ * @date 04.2026
+ */
 
+/**
+ * @brief Структура для представления точки в трехмерном пространстве
+ */
 struct point3d
 {  
-    double x; 
-    double y;   
-    double z; 
+    double x;  ///< Координата X 
+    double y;  ///< Координата y 
+    double z;  ///< Координата z
 
+
+    /**
+     * @brief Конструктор точки
+     * @param x Координата X (по умолчанию 0.0)
+     * @param y Координата Y (по умолчанию 0.0)
+     * @param z Координата Z (по умолчанию 0.0)
+     */
     point3d(double x = 0.0, double y = 0.0, double z = 0.0) : 
         x(x), y(y), z(z) {}
         
+        /**
+        * @brief Вывод координат точки на экран
+        */
         void print() const {
          std::cout << "(" << x << ", " << y << ", " << z << ")\n";
     }
 
+    /**
+     * @brief Получение координаты X
+     * @return Координата X точки
+     */
     double getBackX() const { return x; }
+    
+    /**
+     * @brief Получение координаты Y
+     * @return Координата Y точки
+     */
     double getBackY() const { return y; }
+
+    /**
+     * @brief Получение координаты Z
+     * @return Координата Z точки
+     */
     double getBackZ() const { return z; }
 };
 
-
+/**
+ * @brief Класс для работы с тором и генерации точек
+ */
 class Figure
 {
 private:
-    double R;             // Большой радиус тора (расстояние от центра до оси вращения)
-    double r;             // Малый радиус тора (радиус образующей окружности)
-    int K;                // Количество точек для генерации
-    point3d center;       // Центр тора
-    double tilt_angle_x;  // Угол наклона вокруг оси X (в радианах)
-    double tilt_angle_y;  // Угол наклона вокруг оси Y (в радианах)
-    double tilt_angle_z;  // Угол наклона вокруг оси Z (в радианах)
+    double R;             ///< Большой радиус тора (расстояние от центра до оси вращения)
+    double r;             ///< Малый радиус тора (радиус образующей окружности)
+    int K;                ///< Количество точек для генерации
+    point3d center;       ///< Центр тора
+    double tilt_angle_x;  ///< Угол наклона вокруг оси X (в радианах)
+    double tilt_angle_y;  ///< Угол наклона вокруг оси Y (в радианах)
+    double tilt_angle_z;  ///< Угол наклона вокруг оси Z (в радианах)
 
-   
+    
+    /**
+     * @brief Получение генератора случайных чисел
+     * @return Ссылка на генератор случайных чисел
+     */
     static std::mt19937& getGenerator() {
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -45,6 +85,11 @@ private:
     }
 
 
+    /**
+     * @brief Поворот точки вокруг осей координат
+     * @param point Исходная точка
+     * @return Повернутая точка
+     */
     point3d rotate_point(const point3d& point) const {
         double x = point.x;
         double y = point.y;
@@ -80,6 +125,12 @@ private:
         return point3d(x, y, z);
     }
 
+
+    /**
+     * @brief Поворот точки вокруг осей координат
+     * @param point Исходная точка
+     * @return Повернутая точка
+     */
     point3d translate_point(const point3d& point) const {
         return point3d(point.x + center.x, 
                       point.y + center.y, 
@@ -87,8 +138,20 @@ private:
     }
 
 public:
-    std::vector<point3d> points_arr;
+    std::vector<point3d> points_arr;   ///< Массив точек тора
 
+
+    /**
+     * @brief Конструктор класса Figure
+     * @param R Большой радиус тора (по умолчанию 3.0)
+     * @param r Малый радиус тора (по умолчанию 1.0)
+     * @param center_x Координата X центра тора (по умолчанию 0.0)
+     * @param center_y Координата Y центра тора (по умолчанию 0.0)
+     * @param center_z Координата Z центра тора (по умолчанию 0.0)
+     * @param tilt_x Угол наклона вокруг оси X в градусах (по умолчанию 0.0)
+     * @param tilt_y Угол наклона вокруг оси Y в градусах (по умолчанию 0.0)
+     * @param tilt_z Угол наклона вокруг оси Z в градусах (по умолчанию 0.0)
+     */
     Figure(double R = 3.0, double r = 1.0, 
            double center_x = 0.0, double center_y = 0.0, double center_z = 0.0,
            double tilt_x = 0.0, double tilt_y = 0.0, double tilt_z = 0.0) : 
@@ -97,7 +160,14 @@ public:
         tilt_angle_y(tilt_y * M_PI / 180.0),
         tilt_angle_z(tilt_z * M_PI / 180.0) {}
 
-
+    
+    
+    /**
+     * @brief Вычисление координат точки на торе по параметрическим уравнениям
+     * @param u Угол большого круга (от 0 до 2π)
+     * @param v Угол малого круга (от 0 до π)
+     * @return Точка на поверхности тора с учетом центра и наклона
+     */
     point3d get_torus_point(double u, double v) const {
 
         double x = (R + r * cos(v)) * cos(u);
@@ -113,6 +183,11 @@ public:
     }
 
 
+
+    /**
+     * @brief Генерация случайной точки внутри верхней половины тора
+     * @return Случайная точка внутри тора с учетом центра и наклона
+     */
     point3d rnd()
     {
         std::uniform_real_distribution<double> uDist(0, 2 * M_PI);
@@ -135,6 +210,11 @@ public:
         return point;
     }
 
+
+    /**
+     * @brief Заполнение массива K случайными точками
+     * @param K Количество точек для генерации
+     */
     void filling_K(int K)
     {
         points_arr.clear(); // Очищаем массив перед заполнением
@@ -145,6 +225,11 @@ public:
     }
 
 
+    /**
+     * @brief Получение точки по индексу из массива
+     * @param i Индекс точки в массиве
+     * @return Точка с указанным индексом или точка по умолчанию при ошибке
+     */
     point3d i_point_position(int i)
     {
         if (i < 0 || i >= points_arr.size()) {
@@ -154,17 +239,35 @@ public:
         return points_arr[i];
     }
     
-     void new_user_point(double x, double y, double z)
+
+    /**
+     * @brief Добавление пользовательской точки в массив
+     * @param x Координата X новой точки
+     * @param y Координата Y новой точки
+     * @param z Координата Z новой точки
+     */
+    void new_user_point(double x, double y, double z)
     {
         points_arr.push_back(point3d(x, y, z));
     }
 
+
+    /**
+     * @brief Получение текущих углов наклона тора (в градусах)
+     * @return Вектор углов наклона [x, y, z]
+     */
     std::vector<double> get_tilt_angles() const {
         return {tilt_angle_x * 180.0 / M_PI, 
                 tilt_angle_y * 180.0 / M_PI, 
                 tilt_angle_z * 180.0 / M_PI};
     }
 
+
+
+    /**
+     * @brief Запись всех точек в файл points.txt
+     * @details Формат файла: каждая строка содержит три координаты, разделенные табуляцией
+     */
     void write_data_to_file() {
         std::ofstream out;
         out.open("points.txt");
@@ -178,6 +281,11 @@ public:
         out.close();
     }
 
+
+    /**
+     * @brief Запуск визуализации точек с помощью Python скрипта
+     * @details Вызывает скрипт visualize.py для отображения тора и точек
+     */
     void run_visualization() {
         std::stringstream command;
         command << "python visualize.py";
@@ -192,6 +300,13 @@ public:
         }
     }
 
+
+    /**
+     * @brief Запись параметров тора в файл setting.dat
+     * @param K Количество точек
+     * @param R Большой радиус тора
+     * @param r Малый радиус тора
+     */
     void write_parameters_to_file(int K, double R, double r) {
         std::ofstream out;
         out.open("setting.dat");
@@ -208,6 +323,10 @@ public:
         out.close();
     }
 
+
+    /**
+     * @brief Вывод всех точек массива на экран
+     */
     void printPoints() {
         std::cout << "Points in vector (" << points_arr.size() << " points):\n";
         for (auto point : points_arr) {
@@ -217,14 +336,19 @@ public:
 };
 
 
+/**
+ * @brief Функция отображения меню и получения выбора пользователя
+ * @param choise Текущий выбор пользователя
+ * @return Выбор пользователя
+ */
 int menu_func(int choise)
 {
     std::cout << "Menu:\n" 
-            << "1. i point coords\n"
-            << "2. Add new point\n"
-            << "3. Save data in points.txt\n"
-            << "4. Save parameters in setting.dat\n"
-            << "5. Visualization (matplotlib)\n"
+            << "1. i point coords\n"                      // координата точки
+            << "2. Add new point\n"                       // добавить точку
+            << "3. Save data in points.txt\n"             // сохранить точки в файл .txt
+            << "4. Save parameters in setting.dat\n"      // сохранить параметры в файл .bat
+            << "5. Visualization (matplotlib)\n"          // визуализация
             << "0. Exit\n"
             << "Enter your choise: ";
 
@@ -233,16 +357,20 @@ int menu_func(int choise)
 }
 
 
+/**
+ * @brief Главная функция программы
+ * @return Код завершения программы
+ */
 int main()
 {
-    int K;        
-    double R;     
-    double r;     
-    int choise;   
-    int i;        
-    double x, y, z;
-    double center_x, center_y, center_z;
-    double tilt_x, tilt_y, tilt_z; 
+    int K;        ///< Количество точек        
+    double R;     ///< Большой радиус тора
+    double r;     ///< Малый радиус тора
+    int choise;   ///< Выбор пользователя в меню
+    int i;        ///< Индекс точки
+    double x, y, z;      ///< Координаты точки
+    double center_x, center_y, center_z;     ///< Координаты центра
+    double tilt_x, tilt_y, tilt_z;           ///< Углы наклона
 
     std::cout << "Enter K: ";
     std::cin >> K;
